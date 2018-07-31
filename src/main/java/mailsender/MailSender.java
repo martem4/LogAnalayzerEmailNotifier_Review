@@ -1,8 +1,8 @@
-package MailSender;
+package mailsender;
 
-import Model.LogSysEvent;
-import Model.MailTemplate;
-import Model.MailTemplates;
+import model.LogSysEvent;
+import model.MailTemplate;
+import model.MailTemplates;
 
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;

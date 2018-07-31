@@ -1,4 +1,4 @@
-package Listener;
+package listener;
 
 import DB.DBReader;
 import MailSender.MailSender;
