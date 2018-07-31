@@ -30,7 +30,7 @@ public class DBReader {
                     propertiesDb.getProperty("db.password"));
 
             statement = connection.createStatement();
-            String query = "select ID" +
+            String query = String.format("select ID" +
                     " ,ReceivedAt" +
                     " ,DeviceReportedTime" +
                     " ,Facility" +
@@ -39,8 +39,8 @@ public class DBReader {
                     " ,Message" +
                     " ,SysLogTag" +
                     " from syslog.systemevents t" +
-                    " where t.ReceivedAt >= date_sub(now(), interval " +timeOutReading + " second )\n" +
-                    "  and t.ReceivedAt < now();";
+                    " where t.ReceivedAt >= date_sub(now(), interval %d second )\n" +
+                    "  and t.ReceivedAt < now();", timeOutReading);
             rs = statement.executeQuery(query);
 
             while (rs.next()) {
