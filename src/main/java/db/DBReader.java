@@ -1,4 +1,4 @@
-package DB;
+package db;
 
 import model.LogSysEvent;
 
