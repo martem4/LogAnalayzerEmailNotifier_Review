@@ -1,6 +1,6 @@
 package DB;
 
-import Model.LogSysEvent;
+import model.LogSysEvent;
 
 import java.io.FileInputStream;
 import java.io.IOException;
