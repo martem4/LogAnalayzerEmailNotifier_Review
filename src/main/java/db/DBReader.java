@@ -20,14 +20,17 @@ public class DBReader {
         propertiesDb.load(inputStream);
     }
 
-    public static ArrayList<LogSysEvent> getSysEventList(int timeOutReading) throws IOException {
-        readDbConProperties();
-        ArrayList<LogSysEvent> sysEventList = new ArrayList<LogSysEvent>();
-        ResultSet rs;
+    private static ResultSet getSysEventFromDb(int timeOutReading) {
+
+        ResultSet rs = null;
         try {
-            connection =  DriverManager.getConnection(propertiesDb.getProperty("db.url"),
-                    propertiesDb.getProperty("db.login"),
-                    propertiesDb.getProperty("db.password"));
+            try {
+                connection = DriverManager.getConnection(propertiesDb.getProperty("db.url"),
+                        propertiesDb.getProperty("db.login"),
+                        propertiesDb.getProperty("db.password"));
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
 
             statement = connection.createStatement();
             String query = String.format("select ID" +
@@ -41,8 +44,23 @@ public class DBReader {
                     " from syslog.systemevents t" +
                     " where t.ReceivedAt >= date_sub(now(), interval %d second )\n" +
                     "  and t.ReceivedAt < now();", timeOutReading);
-            rs = statement.executeQuery(query);
+            try {
+                rs = statement.executeQuery(query);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return rs;
+    }
 
+    public static ArrayList<LogSysEvent> getSysEventList(int timeOutReading) throws IOException, SQLException {
+        readDbConProperties();
+        ArrayList<LogSysEvent> sysEventList = new ArrayList<LogSysEvent>();
+        ResultSet rs = getSysEventFromDb(timeOutReading);
+
+        if (rs != null) {
             while (rs.next()) {
                 sysEventList.add(new LogSysEvent(rs.getInt("ID"),
                         rs.getDate("ReceivedAt"),
@@ -53,21 +71,7 @@ public class DBReader {
                         rs.getString("Message"),
                         rs.getString("SysLogTag")));
             }
-        }catch (SQLException sqlEx) {
-            sqlEx.printStackTrace();
-        } finally {
-            try {
-                connection.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-            try {
-                statement.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
         }
         return sysEventList;
     }
-
 }
