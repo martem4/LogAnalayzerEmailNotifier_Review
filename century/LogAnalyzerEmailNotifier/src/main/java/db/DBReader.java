@@ -15,12 +15,12 @@ public class DBReader {
     private static Connection connection;
     private static Statement statement;
 
-    private static void readDbConProperties() throws IOException {
+    private void readDbConProperties() throws IOException {
         InputStream inputStream = new FileInputStream(JDBC_PROPERTIES_FILE);
         propertiesDb.load(inputStream);
     }
 
-    private static ResultSet getSysEventFromDb(int timeOutReading) {
+    private ResultSet getSysEventFromDb(int timeOutReading) {
 
         ResultSet rs = null;
         try {
@@ -55,7 +55,7 @@ public class DBReader {
         return rs;
     }
 
-    public static ArrayList<LogSysEvent> getSysEventList(int timeOutReading) throws IOException, SQLException {
+    public ArrayList<LogSysEvent> getSysEventList(int timeOutReading) throws IOException, SQLException {
         readDbConProperties();
         ArrayList<LogSysEvent> sysEventList = new ArrayList<LogSysEvent>();
         ResultSet rs = getSysEventFromDb(timeOutReading);

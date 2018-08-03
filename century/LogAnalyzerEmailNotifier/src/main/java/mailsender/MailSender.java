@@ -20,7 +20,7 @@ public class MailSender {
     private static final String MAIL_TEMPLATE_RECIPIENTS = "log_mail_recipient.xml";
     private static Properties mailProperties = new Properties();
 
-    public static void sendMailToRecipient(List<MailTemplate> mailTemplateList, LogSysEvent logSysEvent) {
+    public void sendMailToRecipient(List<MailTemplate> mailTemplateList, LogSysEvent logSysEvent) {
         if (mailTemplateList != null) {
             for (MailTemplate mailTemplate : mailTemplateList) {
                 if (mailTemplate.getLogName().toLowerCase().contains(logSysEvent.getSysLogTag().toLowerCase())) {
@@ -32,7 +32,7 @@ public class MailSender {
         }
     }
 
-    private static Properties readEmailSettings() {
+    private Properties readEmailSettings() {
         FileInputStream inputStream = null;
         try {
             inputStream = new FileInputStream(MAIL_SETTINGS_FILE);
@@ -47,7 +47,7 @@ public class MailSender {
         return mailProperties;
     }
 
-    private static void sendMail(String recipientMail, String messgage, String programName, int id) {
+    private void sendMail(String recipientMail, String messgage, String programName, int id) {
         mailProperties = readEmailSettings();
         Session session = Session.getDefaultInstance(mailProperties,
                 new Authenticator() {
@@ -70,7 +70,7 @@ public class MailSender {
         }
     }
 
-    public static List<MailTemplate> readMailTemplate() {
+    public List<MailTemplate> readMailTemplate() {
         List<MailTemplate> mailTemplateList = null;
         try {
             File mailTemplateXml = new File(MAIL_TEMPLATE_RECIPIENTS);
