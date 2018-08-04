@@ -28,7 +28,7 @@
                     <appendAssemblyId>false</appendAssemblyId>
                     <archive>
                         <manifest>
-                            <mainClass>Main</mainClass>
+                            <mainClass>com.century.logssender.Main</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
@@ -41,9 +41,17 @@
                         <manifest>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>libs/</classpathPrefix>
-                            <mainClass>Main</mainClass>
+                            <mainClass>com.century.logssender.Main</mainClass>
                         </manifest>
                     </archive>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>8</source>
+                    <target>8</target>
                 </configuration>
             </plugin>
         </plugins>
@@ -59,6 +67,22 @@
             <groupId>com.sun.mail</groupId>
             <artifactId>javax.mail</artifactId>
             <version>1.5.5</version>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.2</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.reactivex.rxjava2</groupId>
+            <artifactId>rxjava</artifactId>
+            <version>2.2.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+            <version>5.0.8.RELEASE</version>
         </dependency>
     </dependencies>
 </project>
