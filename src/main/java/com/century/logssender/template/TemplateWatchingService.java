@@ -12,6 +12,8 @@ import java.util.concurrent.TimeUnit;
 public class TemplateWatchingService {
 
     private static final Path templatesPath = Paths.get("templates");
+    private static final int UPDATE_SECOND_INTERVAL = 60;
+
     private WatchKey registeredWatchKey;
 
     @PostConstruct
@@ -25,7 +27,7 @@ public class TemplateWatchingService {
     }
 
     Observable<Path> observeTemplates() {
-        return Observable.interval(1, TimeUnit.SECONDS)
+        return Observable.interval(UPDATE_SECOND_INTERVAL, TimeUnit.SECONDS)
                 .map(interval -> registeredWatchKey.pollEvents())
                 .flatMapIterable(i -> i)
                 .map(WatchEvent::context)
