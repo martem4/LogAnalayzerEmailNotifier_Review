@@ -27,9 +27,9 @@ public class MailService {
     }
 
     public void sendLogMailForSelectedTags(LogEvent logEvent) {
-        for (Tag mailTemplate : templateParsingService.getTags()) {
-            if (mailTemplate.getTagName().toLowerCase().contains(logEvent.getSysLogTag().toLowerCase())) {
-                sendMail(logEvent.getMessage(), logEvent.getSysLogTag(), logEvent.getId(), mailTemplate.getRecipients());
+        for (Tag tag : templateParsingService.getTags()) {
+            if (tag.getTagName().toLowerCase().contains(logEvent.getSysLogTag().toLowerCase())) {
+                sendMail(logEvent.getMessage(), logEvent.getSysLogTag(), logEvent.getId(), tag.getRecipients());
             }
         }
     }

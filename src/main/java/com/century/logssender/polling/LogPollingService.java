@@ -31,7 +31,6 @@ public class LogPollingService {
     public Observable<LogEvent> poll(int interval) {
         return Observable.interval(interval, TimeUnit.SECONDS)
                 .map(queryExecutor::queryResults)
-                .map(logEventMapper::parseLogs)
                 .flatMapIterable(l -> l);
     }
 
