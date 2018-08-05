@@ -27,7 +27,7 @@ public class Main {
         final Main main = context.getBean(Main.class);
         main.start();
 
-        System.in.read();
+        blockMainThread();
     }
 
     private void start() {
@@ -39,5 +39,9 @@ public class Main {
 
 
         Runtime.getRuntime().addShutdownHook(new Thread(subscription::dispose));
+    }
+
+    private static void blockMainThread() throws IOException {
+        System.in.read();
     }
 }

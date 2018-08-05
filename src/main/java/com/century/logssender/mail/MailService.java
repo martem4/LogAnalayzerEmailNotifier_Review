@@ -2,8 +2,11 @@ package com.century.logssender.mail;
 
 import com.century.logssender.model.LogEvent;
 import com.century.logssender.model.Tag;
+import com.century.logssender.properties.ApplicationProperties;
 import com.century.logssender.properties.MailProperties;
 import com.century.logssender.template.TemplateParsingService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,13 +18,16 @@ import java.util.Set;
 @Service
 public class MailService {
 
-    private static final String LOG_ANALYZER_LOG_LINK_TEMPLATE ="http://172.172.174.100/loganalyzer/details.php?uid=";
+    private static final String MESSAGE_SENDING_ERROR_MESSAGE = "Error while message sending.";
 
+    private final Logger logger = LoggerFactory.getLogger(MailService.class);
+    private final ApplicationProperties applicationProperties;
     private final TemplateParsingService templateParsingService;
     private final MailProperties mailProperties;
 
     @Autowired
-    public MailService(TemplateParsingService templateParsingService, MailProperties mailProperties) {
+    public MailService(ApplicationProperties applicationProperties, TemplateParsingService templateParsingService, MailProperties mailProperties) {
+        this.applicationProperties = applicationProperties;
         this.templateParsingService = templateParsingService;
         this.mailProperties = mailProperties;
     }
@@ -42,28 +48,22 @@ public class MailService {
     }
 
     private Session getMailingSession() {
-        return Session.getDefaultInstance(mailProperties,
-                    new Authenticator() {
-                        @Override
-                        protected PasswordAuthentication getPasswordAuthentication() {
-                            return new PasswordAuthentication(mailProperties.getUser(), mailProperties.getPassword());
-                        }
-                    });
+        return Session.getDefaultInstance(mailProperties);
     }
 
     private void send(String message, String programName, int id, Set<String> recipientsList, MimeMessage mimeMessage) {
         try {
             sendMessage(message, programName, id, recipientsList, mimeMessage);
         } catch (MessagingException e) {
-            e.printStackTrace();
+            logger.error(MESSAGE_SENDING_ERROR_MESSAGE, e);
         }
     }
 
     private void sendMessage(String message, String programName, int id, Set<String> recipientsList, MimeMessage mimeMessage) throws MessagingException {
         setRecipients(recipientsList, mimeMessage);
         mimeMessage.setSubject(programName);
-        mimeMessage.setText(LOG_ANALYZER_LOG_LINK_TEMPLATE + id + "\n" + message);
-        Transport.send(mimeMessage);
+        mimeMessage.setText(String.format("%s%s\n%s", applicationProperties.getLogAnalyzerLinkTemplate(), id, message));
+        Transport.send(mimeMessage, mailProperties.getUser(), mailProperties.getPassword());
     }
 
     private void setRecipients(Set<String> recipientsList, MimeMessage mimeMessage) throws MessagingException {

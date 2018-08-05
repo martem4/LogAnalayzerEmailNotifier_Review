@@ -3,6 +3,8 @@ package com.century.logssender.template;
 import com.century.logssender.model.Tag;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.yaml.snakeyaml.TypeDescription;
@@ -26,10 +28,11 @@ public class TemplateParsingService {
             "Problem with templates parsing. Please check yaml correctness";
     private static final String FILE_ERROR_MESSAGE_POSTFIX = "with file - %s";
 
+    private final Logger logger = LoggerFactory.getLogger(TemplateParsingService.class);
     private final TemplateWatchingService watchingService;
     private final Set<Tag> tags = new HashSet<>();
-
     private final Yaml yaml;
+
     private Disposable watchSubscription;
 
     @Autowired
@@ -46,7 +49,7 @@ public class TemplateParsingService {
             Files.walkFileTree(TEMPLATES_PATH, new TemplatesVisitor());
             subscribeOnFileChanges();
         } catch (IOException e) {
-            System.err.println(TEMPLATE_PARSING_ERROR_MESSAGE);
+            logger.error(TEMPLATE_PARSING_ERROR_MESSAGE, e);
         }
     }
 
@@ -82,15 +85,14 @@ public class TemplateParsingService {
             tag = yaml.load(inputStream);
             tags.add(tag);
         } catch (IOException e) {
-            showParsingError(path);
+            showParsingError(path, e);
         }
     }
 
-    private void showParsingError(Path path) {
-        System.err.println(String.format(
+    private void showParsingError(Path path, IOException e) {
+        logger.error(String.format(
                 String.join(" ", TEMPLATE_PARSING_ERROR_MESSAGE, FILE_ERROR_MESSAGE_POSTFIX),
-                path.getFileName())
-        );
+                path.getFileName()), e);
     }
 
     private class TemplatesVisitor implements FileVisitor<Path> {
