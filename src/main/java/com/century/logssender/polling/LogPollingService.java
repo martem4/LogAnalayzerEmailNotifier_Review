@@ -12,15 +12,12 @@ import java.util.concurrent.TimeUnit;
 public class LogPollingService {
 
     private final LogQueryExecutor queryExecutor;
-    private final LogEventMapper logEventMapper;
     private final ApplicationProperties applicationProperties;
 
     @Autowired
     public LogPollingService(LogQueryExecutor queryExecutor,
-                             LogEventMapper logEventMapper,
                              ApplicationProperties applicationProperties) {
         this.queryExecutor = queryExecutor;
-        this.logEventMapper = logEventMapper;
         this.applicationProperties = applicationProperties;
     }
 
@@ -31,7 +28,6 @@ public class LogPollingService {
     public Observable<LogEvent> poll(int interval) {
         return Observable.interval(interval, TimeUnit.SECONDS)
                 .map(queryExecutor::queryResults)
-                .map(logEventMapper::parseLogs)
                 .flatMapIterable(l -> l);
     }
 

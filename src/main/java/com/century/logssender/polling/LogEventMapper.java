@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
-public class LogEventMapper {
+class LogEventMapper {
 
     @SneakyThrows
     LogEvent map(ResultSet resultSet) {

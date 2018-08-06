@@ -1,20 +1,20 @@
 package com.century.logssender.model;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 import java.util.Objects;
 import java.util.Set;
 
 @Data
 @NoArgsConstructor
-public class Tag {
+public class Template {
 
     private String tagName;
     private Set<String> recipients;
 
-    public Tag(Set<String> recipients) {
+    public Template(Set<String> recipients) {
         this.recipients = recipients;
     }
 
@@ -22,12 +22,16 @@ public class Tag {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Tag tag = (Tag) o;
-        return Objects.equals(tagName, tag.tagName);
+        Template template = (Template) o;
+        return Objects.equals(tagName, template.tagName);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(tagName);
+    }
+
+    public boolean isFor(LogEvent logEvent) {
+        return getTagName().toLowerCase().contains(logEvent.getSysLogTag().toLowerCase());
     }
 }
