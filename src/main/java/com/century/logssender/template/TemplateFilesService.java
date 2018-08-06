@@ -13,17 +13,20 @@ import java.nio.file.*;
 import java.util.concurrent.TimeUnit;
 
 @Service
-public class TemplateWatchingService {
+public class TemplateFilesService {
 
+    private static final Logger logger = LoggerFactory.getLogger(TemplateFilesService.class);
     private static final Path templatesPath = Paths.get("templates");
 
-    private final Logger logger = LoggerFactory.getLogger(TemplateWatchingService.class);
     private final ApplicationProperties applicationProperties;
+    private final TemplateFileVisitor templateFileVisitor;
+
     private WatchKey registeredWatchKey;
 
     @Autowired
-    public TemplateWatchingService(ApplicationProperties applicationProperties) {
+    public TemplateFilesService(ApplicationProperties applicationProperties, TemplateFileVisitor templateFileVisitor) {
         this.applicationProperties = applicationProperties;
+        this.templateFileVisitor = templateFileVisitor;
     }
 
     @PostConstruct
@@ -36,13 +39,17 @@ public class TemplateWatchingService {
         }
     }
 
-    Observable<Path> observeTemplates() {
+    Observable<Path> observeChangedTemplates() {
         return Observable.interval(applicationProperties.getTemplatesUpdatePollingInterval(), TimeUnit.SECONDS)
                 .map(interval -> registeredWatchKey.pollEvents())
                 .flatMapIterable(i -> i)
                 .map(WatchEvent::context)
                 .cast(Path.class)
                 .map(templatesPath::resolve);
+    }
+
+    Observable<Path> observeInitialTemplates() {
+        return templateFileVisitor.observeInitialTemplates();
     }
 
 }

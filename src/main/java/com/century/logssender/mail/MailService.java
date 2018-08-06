@@ -1,10 +1,10 @@
 package com.century.logssender.mail;
 
 import com.century.logssender.model.LogEvent;
-import com.century.logssender.model.Tag;
+import com.century.logssender.model.Template;
 import com.century.logssender.properties.ApplicationProperties;
 import com.century.logssender.properties.MailProperties;
-import com.century.logssender.template.TemplateParsingService;
+import com.century.logssender.template.TemplateManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,29 +22,26 @@ public class MailService {
 
     private final Logger logger = LoggerFactory.getLogger(MailService.class);
     private final ApplicationProperties applicationProperties;
-    private final TemplateParsingService templateParsingService;
+    private final TemplateManager templateManager;
     private final MailProperties mailProperties;
 
     @Autowired
-    public MailService(ApplicationProperties applicationProperties, TemplateParsingService templateParsingService, MailProperties mailProperties) {
+    public MailService(ApplicationProperties applicationProperties, TemplateManager templateManager, MailProperties mailProperties) {
         this.applicationProperties = applicationProperties;
-        this.templateParsingService = templateParsingService;
+        this.templateManager = templateManager;
         this.mailProperties = mailProperties;
     }
 
     public void sendLogMailForSelectedTags(LogEvent logEvent) {
-        for (Tag tag : templateParsingService.getTags()) {
-            if (tag.getTagName().toLowerCase().contains(logEvent.getSysLogTag().toLowerCase())) {
-                sendMail(logEvent.getMessage(), logEvent.getSysLogTag(), logEvent.getId(), tag.getRecipients());
-            }
-        }
+        templateManager.getTemplates()
+                .stream()
+                .filter(template -> template.isFor(logEvent))
+                .forEach(template -> sendMail(logEvent, template.getRecipients()));
     }
 
-    private void sendMail(String message, String programName, int id, Set<String> recipientsList) {
-        Session session = getMailingSession();
-
-        MimeMessage mimeMessage = new MimeMessage(session);
-        send(message, programName, id, recipientsList, mimeMessage);
+    private void sendMail(LogEvent logEvent, Set<String> recipientsList) {
+        MimeMessage mimeMessage = new MimeMessage(getMailingSession());
+        send(logEvent.getMessage(), logEvent.getSysLogTag(), logEvent.getId(), recipientsList, mimeMessage);
     }
 
     private Session getMailingSession() {
