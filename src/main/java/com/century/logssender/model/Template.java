@@ -2,6 +2,7 @@ package com.century.logssender.model;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 import java.util.Objects;
 import java.util.Set;
