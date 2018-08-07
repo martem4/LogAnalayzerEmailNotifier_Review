@@ -1,7 +1,6 @@
 package com.century.logssender.mail;
 
 import com.century.logssender.model.LogEvent;
-import com.century.logssender.model.Template;
 import com.century.logssender.properties.ApplicationProperties;
 import com.century.logssender.properties.MailProperties;
 import com.century.logssender.template.TemplateManager;
@@ -10,7 +9,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.mail.*;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.Session;
+import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import java.util.Set;
@@ -38,30 +40,26 @@ public class MailService {
         templateManager.getTemplates()
                 .stream()
                 .filter(template -> template.isFor(logEvent))
-                .forEach(template -> sendMail(logEvent, template.getRecipients()));
+                .forEach(template -> createMimeMessageAndSend(logEvent, template.getRecipients()));
     }
 
-    private void sendMail(LogEvent logEvent, Set<String> recipientsList) {
+    private void createMimeMessageAndSend(LogEvent logEvent, Set<String> recipientsList) {
         MimeMessage mimeMessage = new MimeMessage(getMailingSession());
-        send(logEvent.getMessage(), logEvent.getSysLogTag(), logEvent.getId(), recipientsList, mimeMessage);
+        try {
+            processMessageAndSend(logEvent, recipientsList, mimeMessage);
+        } catch (MessagingException e) {
+            logger.error(MESSAGE_SENDING_ERROR_MESSAGE, e);
+        }
     }
 
     private Session getMailingSession() {
         return Session.getDefaultInstance(mailProperties);
     }
 
-    private void send(String message, String programName, int id, Set<String> recipientsList, MimeMessage mimeMessage) {
-        try {
-            sendMessage(message, programName, id, recipientsList, mimeMessage);
-        } catch (MessagingException e) {
-            logger.error(MESSAGE_SENDING_ERROR_MESSAGE, e);
-        }
-    }
-
-    private void sendMessage(String message, String programName, int id, Set<String> recipientsList, MimeMessage mimeMessage) throws MessagingException {
+    private void processMessageAndSend(LogEvent logEvent, Set<String> recipientsList, MimeMessage mimeMessage) throws MessagingException {
         setRecipients(recipientsList, mimeMessage);
-        mimeMessage.setSubject(programName);
-        mimeMessage.setText(String.format("%s%s\n%s", applicationProperties.getLogAnalyzerLinkTemplate(), id, message));
+        mimeMessage.setSubject(logEvent.getSysLogTag());
+        mimeMessage.setText(String.format("%s%s\n%s", applicationProperties.getLogAnalyzerLinkTemplate(), logEvent.getId(), logEvent.getMessage()));
         Transport.send(mimeMessage, mailProperties.getUser(), mailProperties.getPassword());
     }
 
