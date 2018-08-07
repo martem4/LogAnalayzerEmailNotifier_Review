@@ -2,8 +2,6 @@ package com.century.logssender;
 
 import com.century.logssender.observer.LogObserver;
 import com.century.logssender.polling.LogPollingService;
-import com.century.logssender.template.TemplateManager;
-import io.reactivex.Observable;
 import io.reactivex.disposables.Disposable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -15,13 +13,11 @@ import java.io.IOException;
 public class Main {
     private final LogPollingService logPollingService;
     private final LogObserver logObserver;
-    private final TemplateManager templateManager;
 
     @Autowired
-    public Main(LogPollingService logPollingService, LogObserver logObserver, TemplateManager templateManager) {
+    public Main(LogPollingService logPollingService, LogObserver logObserver) {
         this.logPollingService = logPollingService;
         this.logObserver = logObserver;
-        this.templateManager = templateManager;
     }
 
     public static void main(String[] args) throws IOException {

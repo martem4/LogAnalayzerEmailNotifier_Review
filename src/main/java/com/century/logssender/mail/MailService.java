@@ -26,7 +26,9 @@ public class MailService {
     private final MailProperties mailProperties;
 
     @Autowired
-    public MailService(ApplicationProperties applicationProperties, TemplateManager templateManager, MailProperties mailProperties) {
+    public MailService(ApplicationProperties applicationProperties,
+                       TemplateManager templateManager,
+                       MailProperties mailProperties) {
         this.applicationProperties = applicationProperties;
         this.templateManager = templateManager;
         this.mailProperties = mailProperties;

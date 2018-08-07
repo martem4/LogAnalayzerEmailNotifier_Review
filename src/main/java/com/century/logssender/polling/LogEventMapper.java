@@ -5,8 +5,6 @@ import lombok.SneakyThrows;
 import org.springframework.stereotype.Component;
 
 import java.sql.ResultSet;
-import java.util.ArrayList;
-import java.util.List;
 
 @Component
 class LogEventMapper {
@@ -22,17 +20,4 @@ class LogEventMapper {
                 resultSet.getString("Message"),
                 resultSet.getString("SysLogTag"));
     }
-
-    @SneakyThrows
-    List<LogEvent> parseLogs(ResultSet resultSet) {
-        final List<LogEvent> result = new ArrayList<>();
-
-        while (resultSet.next()) {
-            result.add(map(resultSet));
-        }
-
-        return result;
-    }
-
-
 }
