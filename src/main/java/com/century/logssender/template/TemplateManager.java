@@ -48,8 +48,8 @@ public class TemplateManager {
     private void subscribeOnTemplates() {
         watchSubscription = Observable.merge(filesService.observeChangedTemplates(),
                                              filesService.observeInitialTemplates())
-                .map(this.templateParser::parseTemplate)
                 .observeOn(Schedulers.newThread())
+                .map(this.templateParser::parseTemplate)
                 .subscribe(this.templates::add);
     }
 
